@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Appointments · AI Hospital{% endblock %}
+
+{% block content %}
+<div class="glass-card">
+  <div class="card-header">
+    <h3><i class="fas fa-calendar-check"></i> All Appointments</h3>
+    <a href="{{ url_for('add_appointment') }}" class="btn btn-sm">
+      <i class="fas fa-plus"></i> Book Appointment
+    </a>
+  </div>
+
+  <div class="table-wrapper">
+    {% if appointments and appointments|length > 0 %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th><th>Patient</th><th>Doctor</th>
+          <th>Date</th><th>Time</th><th>Department</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in appointments %}
+        <tr>
+          <td>#AP-{{ 1000 + (a.id or 0) }}</td>
+          <td><strong>{{ a.patient_name or 'Unknown' }}</strong></td>
+          <td>{{ a.doctor_name or 'Unassigned' }}</td>
+          <td>{{ a.date or '—' }}</td>
+          <td>{{ a.time or '—' }}</td>
+          <td>{{ a.department or 'General' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p style="color:#5b7e99; text-align:center; padding:2rem;">No appointments yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

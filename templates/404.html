@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}404 · AI Hospital{% endblock %}
+
+{% block content %}
+<div class="form-wrapper" style="text-align:center;">
+  <h2 style="font-size:4rem; color:var(--primary);">404</h2>
+  <p class="subtitle">Page not found</p>
+  <a href="{{ url_for('dashboard') }}" class="btn">
+    <i class="fas fa-home"></i> Back to Dashboard
+  </a>
+</div>
+{% endblock %}

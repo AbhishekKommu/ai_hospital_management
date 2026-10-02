@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · AI Hospital{% endblock %}
+
+{% block content %}
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-card float">
+    <i class="fas fa-user-injured"></i>
+    <span class="stat-value">{{ stats.patients if stats and stats.patients is defined else 0 }}</span>
+    <span class="stat-label">Total Patients</span>
+  </div>
+  <div class="stat-card float" style="animation-delay:.3s;">
+    <i class="fas fa-user-md"></i>
+    <span class="stat-value">{{ stats.doctors if stats and stats.doctors is defined else 0 }}</span>
+    <span class="stat-label">Doctors</span>
+  </div>
+  <div class="stat-card float" style="animation-delay:.6s;">
+    <i class="fas fa-calendar-alt"></i>
+    <span class="stat-value">{{ stats.appointments if stats and stats.appointments is defined else 0 }}</span>
+    <span class="stat-label">Appointments</span>
+  </div>
+  <div class="stat-card float" style="animation-delay:.9s;">
+    <i class="fas fa-heartbeat"></i>
+    <span class="stat-value">{{ stats.available if stats and stats.available is defined else 0 }}</span>
+    <span class="stat-label">Doctors Available</span>
+  </div>
+</div>
+
+<!-- GRID -->
+<div class="dashboard-grid">
+
+  <!-- PATIENTS -->
+  <div class="glass-card">
+    <div class="card-header">
+      <h3><i class="fas fa-user-injured"></i> Recent Patients</h3>
+      <a href="{{ url_for('patients') }}" class="badge" style="text-decoration:none;">View all</a>
+    </div>
+
+    {% if patients and patients|length > 0 %}
+      {% for p in patients %}
+      <div class="list-item">
+        <div class="info">
+          <div class="avatar-sm">
+            {% set pname = (p.name or 'Unknown') %}
+            {% set name_parts = pname.split(' ') %}
+            {{ (name_parts[0][0] if name_parts and name_parts[0] else '?')|upper }}{{ (name_parts[1][0] if name_parts|length > 1 and name_parts[1] else '')|upper }}
+          </div>
+          <div class="details">
+            <span class="name">{{ p.name or 'Unknown' }}</span>
+            <span class="meta">
+              <i class="fas fa-id-card"></i>
+              #PT-{{ 1000 + (p.id or 0) }} · {{ p.age or 0 }} yrs · {{ p.gender or 'N/A' }}
+            </span>
+          </div>
+        </div>
+        <div class="status-pill {% if p.status == 'Critical' %}critical{% elif p.status == 'Recovering' %}recovering{% endif %}">
+          {{ p.status or 'Stable' }}
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p style="color:#5b7e99; text-align:center; padding:1rem;">No patients yet.</p>
+    {% endif %}
+
+    <div style="margin-top:1.2rem; display:flex; justify-content:flex-end;">
+      <a href="{{ url_for('add_patient') }}" class="btn btn-sm btn-outline">
+        <i class="fas fa-plus"></i> Add Patient
+      </a>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div style="display:flex; flex-direction:column; gap:2rem;">
+
+    <!-- APPOINTMENTS -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h3><i class="fas fa-clock"></i> Upcoming Appointments</h3>
+        <a href="{{ url_for('appointments') }}" class="badge" style="text-decoration:none;">All</a>
+      </div>
+
+      {% if appointments and appointments|length > 0 %}
+        {% for a in appointments %}
+        <div class="appointment-item">
+          <div>
+            <div class="appointment-time">{{ a.time or '--:--' }} · {{ a.date or 'TBD' }}</div>
+            <div class="appointment-doc">{{ a.doctor_name or 'Unassigned' }}</div>
+            <div class="appointment-dept">{{ a.department or 'General' }} · {{ a.patient_name or 'Unknown' }}</div>
+          </div>
+          <i class="fas fa-chevron-right" style="color:var(--primary-light);"></i>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p style="color:#5b7e99; text-align:center; padding:1rem;">No appointments scheduled.</p>
+      {% endif %}
+
+      <div style="margin-top:1rem; display:flex; justify-content:flex-end;">
+        <a href="{{ url_for('add_appointment') }}" class="btn btn-sm">
+          <i class="fas fa-calendar-plus"></i> New Appointment
+        </a>
+      </div>
+    </div>
+
+    <!-- DOCTORS — FIXED SECTION -->
+    <div class="glass-card">
+      <div class="card-header">
+        <h3><i class="fas fa-user-md"></i> Doctors on Duty</h3>
+        <span class="badge">{{ stats.available if stats and stats.available is defined else 0 }} active</span>
+      </div>
+
+      {% if doctors and doctors|length > 0 %}
+        {% for d in doctors %}
+        <div class="list-item" style="padding:.6rem 0;">
+          <div class="info">
+            <div class="avatar-sm">
+              {% set dname = (d.name or 'Unknown') %}
+              {% set dparts = dname.split(' ') %}
+              {{ (dparts[0][0] if dparts and dparts[0] else '?')|upper }}{{ (dparts[1][0] if dparts|length > 1 and dparts[1] else '')|upper }}
+            </div>
+            <div class="details">
+              <span class="name">{{ d.name or 'Unknown' }}</span>
+              <span class="meta"><i class="fas fa-stethoscope"></i> {{ d.department or 'General' }}</span>
+            </div>
+          </div>
+
+          {% set avail = d.available if d.available is defined and d.available else 'No' %}
+          <i class="fas fa-circle {% if avail == 'Yes' %}dot-available{% else %}dot-leave{% endif %}"></i>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p style="color:#5b7e99; text-align:center; padding:1rem;">No doctors registered.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}
